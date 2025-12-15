@@ -1,15 +1,1 @@
-Build a generic "Module Generator" core that could be reused across projects.
-
-Goal:
-- Given a module specification string and a set of options, generate:
-  1) a file tree
-  2) code files
-  3) architecture decisions
-  4) design patterns explanation
-  5) runbook
-
-Constraints:
-- Node.js + TypeScript
-- Keep it framework-free (no Express)
-- Provide a CLI entry point
-- Keep code clean and testable
+Construa um sistema de crafting

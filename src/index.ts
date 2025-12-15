@@ -6,7 +6,7 @@ import { GoogleGenAI  } from "@google/genai";
 import { moduleOutputSchema } from "./schema.js";
 import { SYSTEM_INSTRUCTION, buildUserPrompt } from "./prompts.js";
 import { validateModuleOutput } from "./validate.js";
-import { options } from "./sampleOptions"
+import {typescriptOptions, unityOptions} from "./sampleOptions"
 
 dotenv.config({ path: ".env.local" });
 
@@ -22,7 +22,7 @@ async function main() {
     );
 
     const client = new GoogleGenAI({ apiKey: API_KEY });
-    const userPrompt = buildUserPrompt(moduleDescription, options);
+    const userPrompt = buildUserPrompt(moduleDescription, unityOptions);
 
     const resp = await client.models.generateContent({
         model: MODEL,
