@@ -1,37 +1,27 @@
-export const typescriptOptions = {
-    language: "TypeScript",
-    runtimeOrPlatform: "Node.js 20",
-    architectureStyle: "hexagonal",
-    allowedPatterns: ["Strategy", "Factory", "Dependency Injection", "Repository"],
-    includeTests: true,
-    testingFramework: "Jest",
-    includeLintFormat: true,
-    lintFormat: ["eslint", "prettier"],
-    errorHandling: "typed-errors",
-    asyncStyle: "async-await",
-    constraints: [
-        "no external database (in-memory ok)",
-        "no web framework unless explicitly needed",
-        "no placeholder code"
-    ],
-    outputDetailLevel: "high",
-    namingConvention: "camelCase",
-    moduleBoundary: "single-module"
-} as const;
-
 export const unityOptions = {
     language: "C#",
     version: "9.0",
     runtimeOrPlatform: "Unity 6.2 LTS",
     dotNetVersion: ".NET Standard 2.1",
     architectureStyle: "component-based",
-    allowedPatterns: ["Observer", "State Machine", "Object Pooling", "Service Locator", "Command", "Factory", "Singleton"],
+    allowedPatterns: {
+        maxWeight: 10,
+        patterns: [
+            {name: "Strategy", weight: 8},
+            {name: "Observer", weight: 9},
+            {name: "State Machine", weight: 7},
+            {name: "Object Pooling", weight: 10},
+            {name: "Service Locator", weight: 6},
+            {name: "Command", weight: 7},
+            {name: "Factory", weight: 8},
+            {name: "Singleton", weight: 5}
+        ]
+    },
     includeTests: true,
     testingFramework: "Unity Test Framework",
-    includeLintFormat: true,
-    lintFormat: ["EditorConfig", "Roslyn Analyzers"],
+/*    includeLintFormat: true,
+    lintFormat: ["EditorConfig", "Roslyn Analyzers"],*/
     errorHandling: "try-catch-log",
-    asyncStyle: "async-await",
     unitySpecific: {
         useScriptableObjects: true,
         useNewInputSystem: true,
@@ -55,13 +45,27 @@ export const unityOptions = {
         properties: "PascalCase",
         monoBehaviours: "PascalCase with descriptive names"
     },
-    moduleBoundary: "assembly-definition",
-   /* folderStructure: {
-        scripts: "Assets/Scripts",
-        prefabs: "Assets/Prefabs",
-        scenes: "Assets/Scenes",
-        resources: "Assets/Resources",
-        materials: "Assets/Materials",
-        tests: "Assets/Tests"
-    }*/
+    //moduleBoundary: "assembly-definition",
+    folderStructure: {
+        scripts: "Scripts",
+        core: "Scripts/Core",
+        events: "Scripts/Events",
+        api: "Scripts/Api",
+        persistence: "Scripts/Persistence",
+        tests: "Tests"
+    },
+    modules: ["Core", "Events", "Api", "Persistence"],
+    interfaces: ["Item", "Inventory", "Event", "Crafting", "Persistence"],
+    defaultInterfaceImplementations: true
 } as const;
+
+export const unitySemanticInstruction = `
+SEMANTIC INSTRUCTIONS:
+- Interfaces: Use all described interfaces to define contracts between components
+- Interfaces: adding I prefix to interface names,
+- Interfaces: lives on api folder.
+- Interfaces: If defaultInterfaceImplementations is true, the interfaces will have default implementations.
+- Modules: All modules must be created.
+- Modules: Modules must be created in the folder structure.
+- Use the name of the feature as base folder name.
+`

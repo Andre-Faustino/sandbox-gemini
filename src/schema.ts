@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { Type, type Schema } from "@google/genai";
+import {z} from "zod";
+import {Type, type Schema} from "@google/genai";
 
 /** JSON Schema (Structured Outputs) */
 export const moduleOutputSchema: Schema = {
@@ -17,18 +17,18 @@ export const moduleOutputSchema: Schema = {
         "qualityChecklist"
     ],
     properties: {
-        moduleName: { type: Type.STRING },
-        oneLineSummary: { type: Type.STRING },
+        moduleName: {type: Type.STRING},
+        oneLineSummary: {type: Type.STRING},
 
         stack: {
             type: Type.OBJECT,
             required: ["language", "runtimeOrPlatform", "frameworks"],
             properties: {
-                language: { type: Type.STRING },
-                runtimeOrPlatform: { type: Type.STRING },
-                frameworks: { type: Type.ARRAY, items: { type: Type.STRING } },
-                testingFramework: { type: Type.STRING },
-                lintFormat: { type: Type.ARRAY, items: { type: Type.STRING } }
+                language: {type: Type.STRING},
+                runtimeOrPlatform: {type: Type.STRING},
+                frameworks: {type: Type.ARRAY, items: {type: Type.STRING}},
+                testingFramework: {type: Type.STRING},
+                lintFormat: {type: Type.ARRAY, items: {type: Type.STRING}}
             }
         },
 
@@ -36,8 +36,8 @@ export const moduleOutputSchema: Schema = {
             type: Type.OBJECT,
             required: ["moduleDescription", "options"],
             properties: {
-                moduleDescription: { type: Type.STRING },
-                options: { type: Type.STRING  }
+                moduleDescription: {type: Type.STRING},
+                options: {type: Type.STRING}
             }
         },
 
@@ -47,10 +47,10 @@ export const moduleOutputSchema: Schema = {
                 type: Type.OBJECT,
                 required: ["decision", "why"],
                 properties: {
-                    decision: { type: Type.STRING },
-                    why: { type: Type.STRING },
-                    tradeoffs: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    alternativesConsidered: { type: Type.ARRAY, items: { type: Type.STRING } }
+                    decision: {type: Type.STRING},
+                    why: {type: Type.STRING},
+                    tradeoffs: {type: Type.ARRAY, items: {type: Type.STRING}},
+                    alternativesConsidered: {type: Type.ARRAY, items: {type: Type.STRING}}
                 }
             }
         },
@@ -59,12 +59,31 @@ export const moduleOutputSchema: Schema = {
             type: Type.ARRAY,
             items: {
                 type: Type.OBJECT,
-                required: ["pattern", "intent", "whereUsed", "whyChosen"],
+                required: ["pattern", "intent", "whereUsed"],
                 properties: {
-                    pattern: { type: Type.STRING },
-                    intent: { type: Type.STRING },
-                    whereUsed: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    whyChosen: { type: Type.STRING }
+                    pattern: {type: Type.STRING},
+                    intent: {type: Type.STRING},
+                    whereUsed: {
+                        type: Type.ARRAY, items: {
+                            type: Type.OBJECT,
+                            required: ["path", "file", "start", "end", "whyChosen"],
+                            properties: {
+                                path: {type: Type.STRING},
+                                file: {type: Type.STRING},
+                                start: {
+                                    type: Type.OBJECT,
+                                    required: ["line", "column"],
+                                    properties: {line: {type: Type.NUMBER}, column: {type: Type.NUMBER}}
+                                },
+                                end: {
+                                    type: Type.OBJECT,
+                                    required: ["line", "column"],
+                                    properties: {line: {type: Type.NUMBER}, column: {type: Type.NUMBER}}
+                                },
+                                whyChosen: {type: Type.STRING}
+                            },
+                        }
+                    }
                 }
             }
         },
@@ -75,9 +94,9 @@ export const moduleOutputSchema: Schema = {
                 type: Type.OBJECT,
                 required: ["path", "kind", "purpose"],
                 properties: {
-                    path: { type: Type.STRING },
-                    kind: { type: Type.STRING, enum: ["dir", "file"] },
-                    purpose: { type: Type.STRING }
+                    path: {type: Type.STRING},
+                    kind: {type: Type.STRING, enum: ["dir", "file"]},
+                    purpose: {type: Type.STRING}
                 }
             }
         },
@@ -88,10 +107,10 @@ export const moduleOutputSchema: Schema = {
                 type: Type.OBJECT,
                 required: ["path", "content", "language", "role"],
                 properties: {
-                    path: { type: Type.STRING },
-                    language: { type: Type.STRING },
-                    role: { type: Type.STRING },
-                    content: { type: Type.STRING }
+                    path: {type: Type.STRING},
+                    language: {type: Type.STRING},
+                    role: {type: Type.STRING},
+                    content: {type: Type.STRING}
                 }
             }
         },
@@ -100,25 +119,25 @@ export const moduleOutputSchema: Schema = {
             type: Type.OBJECT,
             required: ["howToRun", "commands"],
             properties: {
-                howToRun: { type: Type.ARRAY, items: { type: Type.STRING } },
-                commands: { type: Type.ARRAY, items: { type: Type.STRING } },
+                howToRun: {type: Type.ARRAY, items: {type: Type.STRING}},
+                commands: {type: Type.ARRAY, items: {type: Type.STRING}},
                 envVars: {
                     type: Type.ARRAY,
                     items: {
                         type: Type.OBJECT,
                         required: ["name", "description"],
                         properties: {
-                            name: { type: Type.STRING },
-                            description: { type: Type.STRING },
-                            example: { type: Type.STRING }
+                            name: {type: Type.STRING},
+                            description: {type: Type.STRING},
+                            example: {type: Type.STRING}
                         }
                     }
                 }
             }
         },
 
-        qualityChecklist: { type: Type.ARRAY, items: { type: Type.STRING } },
-        notes: { type: Type.ARRAY, items: { type: Type.STRING } }
+        qualityChecklist: {type: Type.ARRAY, items: {type: Type.STRING}},
+        notes: {type: Type.ARRAY, items: {type: Type.STRING}}
     }
 };
 
@@ -149,8 +168,21 @@ export const ModuleOutputZod = z.object({
         z.object({
             pattern: z.string(),
             intent: z.string(),
-            whereUsed: z.array(z.string()),
-            whyChosen: z.string()
+            whereUsed: z.array(
+                z.object({
+                    path: z.string(),
+                    file: z.string(),
+                    start: z.object({
+                        line: z.number(),
+                        column: z.number()
+                    }),
+                    end: z.object({
+                        line: z.number(),
+                        column: z.number()
+                    }),
+                    whyChosen: z.string()
+                })
+            )
         })
     ),
     tree: z.array(

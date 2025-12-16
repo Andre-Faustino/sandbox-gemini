@@ -1,14 +1,14 @@
 import dotenv from "dotenv";
-import { readFile, mkdir, writeFile } from "node:fs/promises";
+import {readFile, mkdir, writeFile} from "node:fs/promises";
 import path from "node:path";
-import { GoogleGenAI  } from "@google/genai";
+import {GoogleGenAI} from "@google/genai";
 
-import { moduleOutputSchema } from "./schema.js";
-import { SYSTEM_INSTRUCTION, buildUserPrompt } from "./prompts.js";
-import { validateModuleOutput } from "./validate.js";
-import {typescriptOptions, unityOptions} from "./sampleOptions"
+import {moduleOutputSchema} from "./schema.js";
+import {buildUserPrompt, buildSystemInstruction} from "./prompts.js";
+import {validateModuleOutput} from "./validate.js";
+import {unityOptions, unitySemanticInstruction} from "./sampleOptions"
 
-dotenv.config({ path: ".env.local" });
+dotenv.config({path: ".env.local"});
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) throw new Error("Missing GEMINI_API_KEY in env");
@@ -21,14 +21,15 @@ async function main() {
         "utf-8"
     );
 
-    const client = new GoogleGenAI({ apiKey: API_KEY });
-    const userPrompt = buildUserPrompt(moduleDescription, unityOptions);
+    const client = new GoogleGenAI({apiKey: API_KEY});
+    const userPrompt = buildUserPrompt(moduleDescription);
+    const systemInstruction = buildSystemInstruction(unityOptions, unitySemanticInstruction);
 
     const resp = await client.models.generateContent({
         model: MODEL,
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        contents: [{role: "user", parts: [{text: userPrompt}]}],
         config: {
-            systemInstruction: SYSTEM_INSTRUCTION,
+            systemInstruction: systemInstruction,
             responseMimeType: "application/json",
             responseSchema: moduleOutputSchema
         }
@@ -70,7 +71,7 @@ async function main() {
     }
 
     // salva output completo
-    await mkdir("out", { recursive: true });
+    await mkdir("out", {recursive: true});
     await writeFile("out/result.json", JSON.stringify(validated, null, 2), "utf-8");
     console.log("\nSaved: out/result.json");
 
@@ -81,14 +82,15 @@ async function main() {
 
 async function materializeFiles(validated: ReturnType<typeof validateModuleOutput>) {
     const base = path.join("out", "generated");
-    await mkdir(base, { recursive: true });
+    await mkdir(base, {recursive: true});
 
     for (const f of validated.files) {
         const fullPath = path.join(base, f.path);
-        await mkdir(path.dirname(fullPath), { recursive: true });
+        await mkdir(path.dirname(fullPath), {recursive: true});
         await writeFile(fullPath, f.content, "utf-8");
     }
 }
+
 main().catch((err: any) => {
     const msg = err?.message ? String(err.message) : String(err);
     const stack = err?.stack ? String(err.stack) : "";
@@ -112,7 +114,8 @@ main().catch((err: any) => {
             : null;
 
         if (raw) console.error(JSON.stringify(raw, null, 2));
-    } catch {}
+    } catch {
+    }
 
     process.exit(1);
 });

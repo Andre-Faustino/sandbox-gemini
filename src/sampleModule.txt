@@ -1,1 +1,16 @@
-Construa um sistema de crafting
+Construa um sistema de crafting.
+Features:
+- Ter um crafting manager monobehavior singleton que gerencia todos os parametros
+- crafting station que gerencia os crafting processes em fila
+- crafting process que faz o hardwork
+- Cada crafting process tem seu id
+- Cada crafting station tem seu id
+- Usuario interage com crafting manager pra criar um crafting station
+- Usuario interage com crafting station pra criar um ou mais crafting process
+- Usuario pode ter multiplos crafting stations em paralelo
+- Poder processar recipes em fila
+- Poder cancelar crafting
+- Consumir recursos quando iniciar crafting
+- Ter controle de recursos usados no crafting process especifico e geral
+- Recursos sao interfaces implementadas pelo usuario
+- Eventos em cada etapa do crafting process podendo identificar o process, service

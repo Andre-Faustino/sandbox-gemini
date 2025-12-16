@@ -12,14 +12,25 @@ Hard rules:
 - Keep each file reasonably sized; if a file would exceed ~250 lines, split into more files and update the tree.
 `.trim();
 
-export function buildUserPrompt(moduleDescription: string, options: unknown) {
-    const optionsJson = JSON.stringify(options, null, 2);
+export function buildUserPrompt(moduleDescription: string) {
     return `
 MODULE DESCRIPTION:
 ${moduleDescription}
+`.trim();
+}
+
+export function buildSystemInstruction(options: unknown, semanticInstructions: unknown) {
+    const optionsJson = JSON.stringify(options, null, 2);
+    const semanticInstructionsJson = JSON.stringify(semanticInstructions, null, 2);
+    return `
+SYSTEM INSTRUCTION:
+${SYSTEM_INSTRUCTION}
 
 OPTIONS (JSON):
 ${optionsJson}
+
+SEMANTIC INSTRUCTIONS (JSON):
+${semanticInstructionsJson}
 
 DELIVERABLE:
 Generate the full module as:
